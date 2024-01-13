@@ -1,2 +1,2 @@
-## gitBlog
+## GitBlog
 

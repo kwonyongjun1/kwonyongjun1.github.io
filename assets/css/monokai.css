@@ -207,3 +207,11 @@
 .hyde.footer-wrapper{
   padding: 1rem 0!important;
 }
+
+.hyde.posts .hyde.post{
+  padding: 2rem 0!important;
+}
+
+.post-thumbnail-wrapper{
+  display: none;
+}

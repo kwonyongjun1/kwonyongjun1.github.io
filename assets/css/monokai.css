@@ -215,3 +215,15 @@
 .post-thumbnail-wrapper{
   display: none;
 }
+
+.highlight{
+  background-color: #f8f8f2!important;
+}
+
+code{
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif!important;
+}
+
+a{
+  color: #76747f!important;
+}

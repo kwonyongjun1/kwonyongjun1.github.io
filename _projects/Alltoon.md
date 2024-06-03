@@ -1,9 +1,9 @@
 ---
-title: ALLTOON
+title: Alltoon
 description: 사이드 프로젝트
 date: 2023-12-30
 ---
-# ALLTOON
+# Alltoon
 
 서비스(naver,kakao,kakaoPage) 별 웹툰을 한 번에 볼 수 있는 웹사이트입니다.
 

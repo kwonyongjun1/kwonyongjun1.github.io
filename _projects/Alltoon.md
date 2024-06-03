@@ -1,6 +1,6 @@
 ---
 title: ALLTOON
-description: 개인 프로젝트
+description: 사이드 프로젝트
 date: 2023-12-30
 ---
 # ALLTOON

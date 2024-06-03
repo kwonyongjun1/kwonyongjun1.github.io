@@ -5,20 +5,17 @@ date: 2024-01-10
 ---
 
 # Commit-Message 
-#### [👉 접속하기](https://kwonyongjun1.github.io/commit-message/) 
+
 좋은 커밋 메시지를 작성하도록 도와주는 웹사이트입니다.
 컨벤션에 맞게 커밋 메시지를 작성하는데 어려운 팀원들과 신입 사원들을 위해 개발하였습니다.
-
-
 - 일관성 있는 커밋 메시지를 작성하기 위해 커밋 컨벤션에 맞추어 작성할 수 있습니다.
 - 😀 Desktop App도 지원합니다.
 
 
-## Source
+#### [👉 접속하기](https://kwonyongjun1.github.io/commit-message/) 
 <div style= "display: inline-flex;">
 <a href="https://github.com/kwonyongjun1/commit-message"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&link=https://github.com/kwonyongjun1/commit-message"/></a>
 </div>
-
 
 
 

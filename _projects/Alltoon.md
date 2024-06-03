@@ -5,7 +5,7 @@ date: 2023-12-30
 ---
 # ALLTOON
 
-서비스(naver,kakao,kakaoPage)별 웹툰 뷰어
+서비스(naver,kakao,kakaoPage) 별 웹툰을 한 번에 볼 수 있는 웹사이트입니다.
 
 #### [👉 접속하기](https://kn-front.github.io/Alltoon/) 
 <div style= "display: inline-flex;">

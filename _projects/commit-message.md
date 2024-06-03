@@ -6,16 +6,6 @@ date: 2024-01-10
 
 # Commit-Message 
 
-좋은 커밋 메시지를 작성하도록 도와주는 웹사이트입니다.
-컨벤션에 맞게 커밋 메시지를 작성하는데 어려운 팀원들과 신입 사원들을 위해 개발하였습니다.
-- 일관성 있는 커밋 메시지를 작성하기 위해 커밋 컨벤션에 맞추어 작성할 수 있습니다.
-- 😀 Desktop App도 지원합니다.
-
-
-#### [👉 접속하기](https://kwonyongjun1.github.io/commit-message/) 
-
-
-## Language
 <div style= "display: inline-flex">
   <img style="padding: 5px" src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=JavaScript&logoColor=black "/>
   <img style="padding: 5px" src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=black "/>
@@ -24,6 +14,14 @@ date: 2024-01-10
   <img style="padding: 5px" src="https://img.shields.io/badge/Sass-CC6699?style=flat&logo=Sass&logoColor=white "/>
   <img style="padding: 5px" src="https://img.shields.io/badge/Electron-47848F?style=flat&logo=Electron&logoColor=white"/>
 </div>
+
+좋은 커밋 메시지를 작성하도록 도와주는 웹사이트입니다.
+컨벤션에 맞게 커밋 메시지를 작성하는데 어려운 팀원들과 신입 사원들을 위해 개발하였습니다.
+- 일관성 있는 커밋 메시지를 작성하기 위해 커밋 컨벤션에 맞추어 작성할 수 있습니다.
+- 😀 Desktop App도 지원합니다.
+
+
+#### [👉 접속하기](https://kwonyongjun1.github.io/commit-message/) 
 
 
 ## Commit Message Basic Structure

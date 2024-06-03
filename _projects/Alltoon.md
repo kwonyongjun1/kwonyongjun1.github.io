@@ -8,9 +8,6 @@ date: 2023-12-30
 서비스(naver,kakao,kakaoPage) 별 웹툰을 한 번에 볼 수 있는 웹사이트입니다.
 
 #### [👉 접속하기](https://kn-front.github.io/Alltoon/) 
-<div style= "display: inline-flex;">
-<a href="https://github.com/kwonyongjun1/webtoon"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&link=https://github.com/kwonyongjun1/commit-message"/></a>
-</div>
 
 ## Language
 <div style= "display: inline-flex">
@@ -41,4 +38,10 @@ date: 2023-12-30
 - 불필요한 호출을 방지하고 캐싱을 통해 웹 성능을 최적화하였습니다.
 
 **git branch 전략 도입**
-- 효율적으로 버전 별로 소스 관리를 하기 위해서 git branch 전략을 도입하여 형상 관리하였습니다. 
+- 효율적으로 버전 별로 소스 관리를 하기 위해서 git branch 전략을 도입하여 형상 관리하였습니다.
+
+  ## Source
+  <div style= "display: inline-flex;">
+<a href="https://github.com/kwonyongjun1/webtoon"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&link=https://github.com/kwonyongjun1/commit-message"/></a>
+</div>
+

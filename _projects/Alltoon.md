@@ -5,11 +5,6 @@ date: 2023-12-30
 ---
 # Alltoon
 
-서비스(naver,kakao,kakaoPage) 별 웹툰을 한 번에 볼 수 있는 웹사이트입니다.
-
-#### [👉 접속하기](https://kn-front.github.io/Alltoon/) 
-
-## Language
 <div style= "display: inline-flex">
   <img style="padding: 5px" src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=React&logoColor=black"/>
   <img style="padding: 5px" src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=TypeScript&logoColor=white"/>
@@ -17,6 +12,10 @@ date: 2023-12-30
   <img style="padding: 5px" src="https://img.shields.io/badge/reactquery-FF4154?style=flat&logo=reactquery&logoColor=white"/> 
   <img style="padding: 5px" src="https://img.shields.io/badge/tailwindcss-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/>
 </div>
+
+서비스(naver,kakao,kakaoPage) 별 웹툰을 한 번에 볼 수 있는 웹사이트입니다.
+
+#### [👉 접속하기](https://kn-front.github.io/Alltoon/) 
 
 
 ## 기능

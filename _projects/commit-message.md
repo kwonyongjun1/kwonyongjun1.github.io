@@ -13,11 +13,6 @@ date: 2024-01-10
 
 
 #### [👉 접속하기](https://kwonyongjun1.github.io/commit-message/) 
-<div style= "display: inline-flex;">
-<a href="https://github.com/kwonyongjun1/commit-message"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&link=https://github.com/kwonyongjun1/commit-message"/></a>
-</div>
-
-
 
 
 ## Language
@@ -54,6 +49,11 @@ date: 2024-01-10
 
 **Toast 메시지 구현**
 - Electron의 호환성과 사용자에게 간결하게 알림을 제공해 주기 위해 Toast 메시지를 구현하였습니다.
+
+## Source
+<div style= "display: inline-flex;">
+<a href="https://github.com/kwonyongjun1/commit-message"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&link=https://github.com/kwonyongjun1/commit-message"/></a>
+</div>
 
 ## References
 - [좋은 커밋 메시지 작성하기](https://github.com/sj960126/Commit-message)

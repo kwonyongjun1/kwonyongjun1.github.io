@@ -1,6 +1,6 @@
 ---
-title: 커밋 메세지
-description: 개인 프로젝트
+title: Commit-Message
+description: 사이드 프로젝트
 date: 2024-01-10
 ---
 

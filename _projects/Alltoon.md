@@ -39,8 +39,9 @@ date: 2023-12-30
 **git branch 전략 도입**
 - 효율적으로 버전 별로 소스 관리를 하기 위해서 git branch 전략을 도입하여 형상 관리하였습니다.
 
-  ## Source
-  <div style= "display: inline-flex;">
-<a href="https://github.com/kwonyongjun1/webtoon"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&link=https://github.com/kwonyongjun1/commit-message"/></a>
+## Source
+  
+<div style= "display: inline-flex;">
+  <a href="https://github.com/kwonyongjun1/webtoon"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&link=https://github.com/kwonyongjun1/commit-message"/></a>
 </div>
 

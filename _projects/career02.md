@@ -15,7 +15,8 @@ SAP 기반 국가철도공단 업무 시스템 유지보수 및 고객 대응 �
 - Front/Back : 4명
 
 ### 사용 기술
-SpringFrameWork, jQuery, Nexacro
+- Front : jQuery, Nexacro
+- Back : Egov, MyBatis
 
 ### 맡은 업무
 

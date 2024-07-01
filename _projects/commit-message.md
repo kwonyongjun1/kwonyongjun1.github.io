@@ -42,11 +42,6 @@ date: 2024-01-10
 - 사용자에게 커밋 메시지 작성 이력을 제공해 주기 위해 local storage를 활용하여 히스토리 기능 구현
 - Electron의 호환성과 사용자에게 간결하게 알림을 제공하기 위해 Toast 메시지 알림 구현
 
-## Source
-<div style= "display: inline-flex;">
-<a href="https://github.com/kwonyongjun1/commit-message"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=GitHub&logoColor=white&link=https://github.com/kwonyongjun1/commit-message"/></a>
-</div>
-
 ## References
 - [좋은 커밋 메시지 작성하기](https://github.com/sj960126/Commit-message)
 - [gitmoji](https://gitmoji.dev/)

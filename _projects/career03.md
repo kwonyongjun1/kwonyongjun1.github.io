@@ -14,7 +14,8 @@ date: 2023-01-30
 #### 2022-08 ~ 2023-01
 
 ### 사용 기술
-jQuery, Sass, SpringFrameWork
+- Front : jQuery, Sass
+- back : Spring, MyBatis
 
 ### 구성 인원
 - Front/Back : 21명

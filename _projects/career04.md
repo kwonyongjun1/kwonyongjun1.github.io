@@ -47,7 +47,3 @@ date: 2023-10-30
 **충북 공간정보 플랫폼 안전 공간 서비스 목록 및 상세 페이지 REST API 연동 및 구현**
 - fetch를 활용하여 REST API 연동하였습니다.
 - Spring, MyBatis를 활용하여 REST API를 구현하였습니다.
-
-**충북 공간정보 플랫폼 안전 공간 서비스 목록 및 상세 페이지  REST API 연동 및 구현**
-- fetch를 활용하여 REST API 연동하였습니다.
-- SpringFramework, MyBatis를 활용하여 REST API를 구현하였습니다.

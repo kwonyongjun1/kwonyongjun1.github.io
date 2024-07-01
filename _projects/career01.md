@@ -15,8 +15,9 @@ date: 2022-03-01
 #### 2021.05 ~ 2022.02
 
 ### 사용기술
-jQuery, Sass
-
+- Front : jQuery, Sass
+- Back : Egov, MyBatis
+  
 ### 구성인원
 - front : 2명
 - back : 2명

@@ -40,6 +40,8 @@ const Header = () => {
         </Link>
 
         <div className="flex items-center gap-4">
+          <Link href="/about">About</Link>
+          <Link href="/posts">Posts</Link>
           <button
             onClick={onClick}
             className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"

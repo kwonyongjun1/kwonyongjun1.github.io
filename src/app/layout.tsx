@@ -32,7 +32,9 @@ const RootLayout = ({
         <Provider>
           <div className="outline-none font-sans">
             <Header />
-            <main className=" h-[1200px]">{children}</main>
+            <main className="max-w-[1280px] pt-[50px] mx-auto w-full flex flex-col gap-lg justify-start items-start">
+              {children}
+            </main>
           </div>
         </Provider>
       </body>

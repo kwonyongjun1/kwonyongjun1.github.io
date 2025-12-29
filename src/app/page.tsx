@@ -5,6 +5,39 @@ const Home = () => {
   return (
     <div className="w-full flex flex-col gap-md">
       <div className="flex flex-col gap-md">
+        <div className="flex items-center justify-center">
+          <article className="flex w-full gap-sm">
+            <div className="w-36 h-36 bg-app-sub-bg dark:bg-app-dark-sub-bg rounded-full flex flex-row">
+              <Image
+                src="/images/avatar.png"
+                alt="avatar"
+                width={144}
+                height={144}
+              />
+            </div>
+            <div className="flex-1 flex flex-col gap-sm">
+              <div className=" text-sm">
+                <h1 className="text-2xl font-semibold">권용준</h1>
+              </div>
+              <div className="text-app-sub-text dark:text-app-dark-sub-text text-sm">
+                <p>Frontend Engineer</p>
+              </div>
+              <div className="text-app-sub-text dark:text-app-dark-sub-text text-sm">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Quisquam, quos.
+                </p>
+              </div>
+              <div className="flex items-center justify-end">
+                <div className="text-app-primary dark:text-app-dark-primary text-sm cursor-pointer px-sm">
+                  <Link href="/about">Detail</Link>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div className="flex flex-col gap-md">
         <div className="flex items-center justify-between gap-sm">
           <span className="text-xl font-semibold">Posts</span>
           <button className="px-md py-sm bg-app-sub-bg dark:bg-app-dark-sub-bg rounded-md text-app-sub-text dark:text-app-dark-sub-text text-sm">

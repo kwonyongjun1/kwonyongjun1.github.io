@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { Post } from "../post";
+import { Post } from "../model/type";
+import Link from "next/link";
 
 interface PostItemProps {
   post: Post;
@@ -7,13 +8,13 @@ interface PostItemProps {
 
 const PostItem = ({ post }: PostItemProps) => {
   return (
-    <a
-      key={post.id}
+    <Link
+      href={`/posts/${post.category}/${post.id}`}
       className="h-[380px] animate-fade-in flex flex-col rounded-lg overflow-hidden transition-all ease-in-out duration-300 group cursor-pointer border border-app-sub-bg dark:border-app-dark-sub-bg first:col-span-1 md:first:col-span-2"
     >
       <div className="w-full min-h-[180px] max-h-[180px] bg-app-sub-bg dark:bg-app-dark-sub-bg overflow-hidden">
         <Image
-          src={post.image ?? "/empty"}
+          src={"/empty.png"}
           alt="post-1"
           width={380}
           height={180}
@@ -25,15 +26,15 @@ const PostItem = ({ post }: PostItemProps) => {
           {post.title}
         </div>
         <div className="line-clamp-3 text-app-sub-text dark:text-app-dark-sub-text">
-          {post.summary}
+          {post.description}
         </div>
         <div className="flex-1 flex items-end justify-between gap-sm">
           <div className="text-app-sub-text dark:text-app-dark-sub-text text-sm">
-            {post.createdAt}
+            {post.releaseDate.toString()}
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 };
 

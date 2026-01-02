@@ -1,17 +1,19 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import { join } from "path";
 import matter from "gray-matter";
+import { Metadata, Post } from "../model/type";
 
 const postsDirectory = join(process.cwd(), "src", "db", "markdown", "post");
 
-const paresPost = (filePath: string) => {
+const paresPost = (
+  filePath: string
+): { metadata: Metadata; content: string } => {
   const fileContent = readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);
 
   return {
     metadata: {
       title: data?.title || "",
-      date: data?.date || "",
       description: data?.description || "",
       category: data?.category || "",
       tags: data?.tags || [],
@@ -55,4 +57,40 @@ export const getAllPostParams = () => {
   });
 
   return params;
+};
+
+export const getAllPost = (): Post[] => {
+  if (!existsSync(postsDirectory)) {
+    return [];
+  }
+
+  const categories = readdirSync(postsDirectory).filter((item) => {
+    const itemPath = join(postsDirectory, item);
+    return statSync(itemPath).isDirectory();
+  });
+
+  const posts = categories.flatMap((category) => {
+    const categoryPath = join(postsDirectory, category);
+    const files = readdirSync(categoryPath).filter((file) =>
+      file.endsWith(".mdx")
+    );
+    return files.map((file) => {
+      const filepath = join(categoryPath, file);
+      const slug = file.split(".")[0];
+      const { metadata } = paresPost(filepath);
+
+      return {
+        id: slug,
+        title: metadata.title || "",
+        description: metadata.description || "",
+        category: metadata.category || "",
+        tags: metadata.tags || [],
+        writer: metadata.writer || "",
+        releaseDate: metadata.releaseDate || "",
+        image: "",
+      };
+    });
+  });
+
+  return posts;
 };

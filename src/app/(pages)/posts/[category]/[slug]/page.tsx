@@ -3,7 +3,7 @@ import Badge from "@/shared/ui/Badge";
 import MDXContent from "@/shared/ui/MDXContent";
 import TableOfContents from "@/shared/ui/TableOfContents";
 
-interface PostsProps {
+interface PostProps {
   params: Promise<{ category: string; slug: string }>;
 }
 
@@ -11,7 +11,7 @@ export async function generateStaticParams() {
   return getAllPostParams();
 }
 
-const Posts = async ({ params }: PostsProps) => {
+const Post = async ({ params }: PostProps) => {
   const { category, slug } = await params;
   const { metadata, content } = getPost(category as string, slug as string);
   return (
@@ -42,4 +42,4 @@ const Posts = async ({ params }: PostsProps) => {
   );
 };
 
-export default Posts;
+export default Post;

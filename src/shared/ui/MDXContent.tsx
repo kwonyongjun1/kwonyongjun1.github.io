@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 
 const MDXContent = async ({ content }: { content: string }) => {
   return (
-    <div className="w-full flex flex-col gap-md text-app-text dark:text-app-dark-text">
+    <article className="w-full flex flex-col gap-md text-app-text dark:text-app-dark-text">
       <MDXRemote
         source={content}
         options={{
@@ -165,7 +165,7 @@ const MDXContent = async ({ content }: { content: string }) => {
           ),
         }}
       />
-    </div>
+    </article>
   );
 };
 

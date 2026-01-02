@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import { join } from "path";
 import matter from "gray-matter";
 import { Metadata, Post } from "../model/type";
+import { formatRelativeDate } from "@/shared/utils/date";
 
 const postsDirectory = join(process.cwd(), "src", "db", "markdown", "post");
 
@@ -17,7 +18,7 @@ const paresPost = (
       description: data?.description || "",
       category: data?.category || "",
       tags: data?.tags || [],
-      releaseDate: data?.releaseDate || "",
+      releaseDate: formatRelativeDate(data?.releaseDate) || "",
       writer: data?.writer || "",
     },
     content,
@@ -86,7 +87,7 @@ export const getAllPost = (): Post[] => {
         category: metadata.category || "",
         tags: metadata.tags || [],
         writer: metadata.writer || "",
-        releaseDate: metadata.releaseDate || "",
+        releaseDate: formatRelativeDate(metadata.releaseDate) || "",
         image: "",
       };
     });

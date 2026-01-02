@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Post } from "../model/type";
 import Link from "next/link";
+import Badge from "@/shared/ui/Badge";
 
 interface PostItemProps {
   post: Post;
@@ -22,12 +23,20 @@ const PostItem = ({ post }: PostItemProps) => {
         />
       </div>
       <div className="flex-1 flex flex-col gap-md p-md">
-        <div className="line-clamp-2 font-semibold group-hover:text-app-primary dark:group-hover:text-app-dark-primary break-all">
-          {post.title}
+        <div className="flex flex-col gap-sm">
+          <div className="line-clamp-2 font-semibold group-hover:text-app-primary dark:group-hover:text-app-dark-primary break-all">
+            {post.title}
+          </div>
+          <div className="line-clamp-3 text-app-sub-text dark:text-app-dark-sub-text">
+            {post.description}
+          </div>
+          <div className="flex gap-sm">
+            {post.tags.map((tag, i) => (
+              <Badge key={i} text={tag} />
+            ))}
+          </div>
         </div>
-        <div className="line-clamp-3 text-app-sub-text dark:text-app-dark-sub-text">
-          {post.description}
-        </div>
+
         <div className="flex-1 flex items-end justify-between gap-sm">
           <div className="text-app-sub-text dark:text-app-dark-sub-text text-sm">
             {post.releaseDate.toString()}

@@ -5,7 +5,7 @@ const ShortAbout = () => {
   return (
     <div className="flex items-center justify-center">
       <article className="flex w-full gap-sm">
-        <Avatar src="/images/avatar.png" alt="avatar" size={26} />
+        <Avatar src="/images/avatar.png" alt="avatar" size={20} />
         <div className="flex-1 flex flex-col gap-sm">
           <div className=" text-sm">
             <h1 className="text-2xl font-semibold">권용준</h1>

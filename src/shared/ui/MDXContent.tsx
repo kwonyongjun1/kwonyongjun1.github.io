@@ -23,7 +23,7 @@ const MDXContent = async ({ content }: { content: string }) => {
               className="duration-150 ease-in-out hover:text-app-primary dark:hover:text-app-dark-primary"
             >
               <h1
-                className="font-bold text-4xl md:text-5xl mt-2xl mb-xl cursor-pointer"
+                className="font-bold text-4xl md:text-5xl mt-xl mb-xl cursor-pointer"
                 {...props}
               />
             </Link>
@@ -34,7 +34,7 @@ const MDXContent = async ({ content }: { content: string }) => {
               className="duration-150 ease-in-out hover:text-app-primary dark:hover:text-app-dark-primary"
             >
               <h2
-                className="font-bold text-2xl md:text-3xl mt-2xl mb-lg cursor-pointer"
+                className="font-bold text-2xl md:text-3xl mt-lg mb-lg cursor-pointer"
                 {...props}
               />
             </Link>
@@ -45,7 +45,7 @@ const MDXContent = async ({ content }: { content: string }) => {
               className="duration-150 ease-in-out hover:text-app-primary dark:hover:text-app-dark-primary"
             >
               <h3
-                className="font-semibold text-xl md:text-2xl mt-2xl mb-md cursor-pointer"
+                className="font-semibold text-xl md:text-2xl mt-md mb-md cursor-pointer"
                 {...props}
               />
             </Link>
@@ -101,7 +101,7 @@ const MDXContent = async ({ content }: { content: string }) => {
             }
             return (
               <p
-                className="break-all sm:break-words mb-lg leading-8 md:leading-10"
+                className="break-all sm:break-words leading-8 md:leading-10"
                 {...props}
               />
             );
@@ -144,7 +144,7 @@ const MDXContent = async ({ content }: { content: string }) => {
           figure: (props) => <figure {...props} />,
           ul: (props) => (
             <ul
-              className="list-disc pl-md md:pl-lg mb-md marker:text-text-secondary"
+              className="list-disc pl-md md:pl-lg marker:text-text-secondary"
               {...props}
             />
           ),
@@ -155,7 +155,7 @@ const MDXContent = async ({ content }: { content: string }) => {
             />
           ),
           li: (props) => (
-            <li className="pl-sm mb-sm leading-6 md:leading-8" {...props} />
+            <li className="pl-sm  leading-6 md:leading-8" {...props} />
           ),
           blockquote: (props) => (
             <blockquote
@@ -163,6 +163,7 @@ const MDXContent = async ({ content }: { content: string }) => {
               {...props}
             />
           ),
+          pre: (props) => <pre className="p-md overflow-x-auto" {...props} />,
         }}
       />
     </article>

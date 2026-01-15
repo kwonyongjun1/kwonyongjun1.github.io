@@ -1,7 +1,6 @@
 import ShortAbout from "@/entities/about/ui/ShortAbout";
 import { getAllPost } from "@/entities/post/api/post";
 import PostItem from "@/entities/post/ui/PostItem";
-import Button from "@/shared/ui/Button";
 import Link from "next/link";
 
 const Home = async () => {

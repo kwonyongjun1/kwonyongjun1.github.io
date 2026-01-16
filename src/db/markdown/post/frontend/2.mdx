@@ -8,21 +8,182 @@ releaseDate: 2025-01-01T00:00:00Z
 writer: tester
 ---
 
-## 안녕하세요
+프론트엔드 프로젝트가 커질수록 “어디에 파일을 두어야 하는지”, “기능이 늘었을 때 구조가 얼마나 버틸 수 있는지”가 점점 중요해집니다.  
+기존에 관리하던 방식의 문제점을 개선하기 위해 **FSD(Feature-Sliced Design) 폴더 구조**를 적용하였습니다.
 
-### 안녕하세요1
+---
 
-감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요
+## 기존 폴더구조
 
-### 안녕하세요2
+### 기존 폴더구조
 
-감사해요감사해요감사해요감사해요감사해요감사해요
-감사해요감사해요감사해요감사해요감사해요감사해요
+아래와 같은 “레이어/기술 기준” 구조를 사용하였습니다.
 
-### 안녕하세요3
+- `components/`
+- `pages/`
+- `hooks/`
+- `api/`
+- `utils/`
+- `types/`
 
-감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요
+### 기존 방식의 문제점
 
-### 안녕하세요4
+- **도메인 단위로 변경이 흩어짐**
+  - 예: `결제` 기능 수정 시 `components/`, `api/`, `hooks/`, `types/` 등 여러 폴더를 수정해야함
+  - 결과적으로 “결제 기능이 어디까지인지” 경계가 흐려짐
+- **공용 컴포넌트가 무한정 늘어남**
+  - `components/common` 같은 폴더가 커지면서 “이게 진짜 공용인가?”가 애매해짐
+- **재사용을 위한 재사용 발생**
+  - 범용으로 만들려고 하다 보니 오히려 사용하기 어려운 컴포넌트/유틸이 생김
+- **리팩토링 비용 증가**
+  - 기능 단위로 폴더가 묶여 있지 않아서, 리팩토링할 때 누락/사이드 이펙트가 늘어남
 
-감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요감사해요
+결국 “기능 단위로 잘 묶이고, 변경 영향 범위가 예측 가능한 구조”가 필요하였습니다.
+
+---
+
+## FSD 폴더 구조
+
+FSD는 파일을 “기능 단위”로 나누고, 레이어별 책임을 분리하는 방식입니다.
+
+- **app**: 앱 초기화, 라우팅, 전역 프로바이더, 전역 스타일 등
+- **processes**(선택): 여러 페이지/feature를 엮는 흐름(예: 온보딩, 결제 플로우)
+- **pages**: 라우트 단위 페이지
+- **widgets**: 페이지를 구성하는 큰 UI 블록(여러 features/entities를 조합)
+- **features**: 사용자 가치가 있는 “행동/기능” 단위(예: 로그인, 검색, 장바구니 담기)
+- **entities**: 비즈니스 엔티티(도메인 모델) 단위(예: user, product, order)
+- **shared**: 전역에서 재사용 가능한 UI/유틸/라이브러리 설정 등
+
+### 예시 폴더 트리
+
+```text
+src/
+  app/
+    providers/
+    router/
+    styles/
+
+  pages/
+    home/
+    product-detail/
+    login/
+
+  widgets/
+    header/
+    product-list/
+    cart-summary/
+
+  features/
+    auth-login/
+    product-like/
+    cart-add/
+
+  entities/
+    user/
+    product/
+    cart/
+
+  shared/
+    ui/
+    lib/
+    api/
+    hooks/
+    config/
+    types/
+```
+
+> 핵심은 “기능(features)과 도메인(entities)을 분리하고, 조합은 widgets/pages에서 한다” 입니다.
+
+---
+
+## FSD 적용하며 겪었던 문제
+
+### entities와 features 분리 모호함
+
+예를 들어 “상품 좋아요”를 만든다고 했을 때 이런 고민이 생겼습니다.
+
+- 좋아요 API 호출은 `product`에 붙어야 할까?
+- 아니면 “좋아요”는 사용자 액션이니까 `features`일까?
+- 좋아요 버튼 UI는 어디에 두지?
+
+#### 해결법
+
+**entities는 데이터/모델 중심, features는 사용자 행동 중심**으로 정리했습니다.
+
+- “이게 없으면 도메인이 성립하나?” → **entities**
+- “사용자가 뭔가를 ‘한다’가 들어가나?” → **features**
+- “조합/배치/레이아웃인가?” → **widgets/pages**
+
+- **entities(product)**: 상품 자체를 표현하기 위한 모델/타입/기본 API/기본 UI
+  - `product/model` (state, type)
+  - `product/api` (product 조회 등 “상품 자체”에 대한 API)
+  - `product/ui` (ProductCard처럼 엔티티 표현 UI)
+- **features(product-like)**: “좋아요 토글”처럼 *사용자의 의도/행동*이 들어간 기능
+  - like/unlike mutation
+  - 좋아요 버튼(액션 포함 UI)
+  - 토글 후 optimistic update 같은 상호작용 로직
+
+#### 예시 구조
+
+```text
+entities/
+  product/
+    model/
+    api/
+    ui/
+
+features/
+  product-like/
+    model/   // 좋아요 토글 상태/로직
+    api/     // like/unlike mutation
+    ui/      // LikeButton (action 포함)
+```
+
+### hook 함수 분리 모호함
+
+- `useDebounce`는 어디에 둬야하는지
+- `useInfiniteScroll`를 shared, feature 폴더 중 어디에 둬야할지
+- `useAuth` 같은 훅은 shared, entity 폴더 중 어디에 둬야할지
+
+#### 해결법
+
+훅은 **재사용 범위 기준**으로 정리했습니다.
+
+- “어느 프로젝트에서도 그대로 쓸 수 있나?” → `shared/hooks`
+- “user/product 같은 도메인 지식이 들어가나?” → `entities/*/hooks`
+- “특정 기능 플로우에만 쓰이나?” → `features/*/hooks`
+
+1. **완전 범용(도메인/기능 의존 없음)** → `shared/hooks`
+   - `useDebounce`, `useThrottle`, `useOutsideClick` 등
+2. **특정 엔티티(도메인)에 강하게 결합** → 해당 `entities/<name>`
+   - `useUser`, `useProductQuery` 등 (user/product 모델과 긴밀)
+3. **특정 기능(features)의 일부** → 해당 `features/<name>`
+   - `useLoginForm`, `useLikeToggle` 등 (기능을 위한 훅)
+
+#### 예시 구조
+
+```text
+shared/
+  hooks/
+    useDebounce.ts
+    useOutsideClick.ts
+
+entities/
+  user/
+    hooks/
+      useUser.ts
+
+features/
+  auth-login/
+    hooks/
+      useLoginForm.ts
+```
+
+---
+
+## 적용 후기
+
+FSD 폴더 구조의 가장 큰 장점은 **변경 영향 범위가 예측 가능해졌다는 점**입니다.
+기능 수정 시 관련 코드가 한 곳에 모여 있어 탐색 시간이 줄고 공용(shared) 코드가 무분별하게 커지는 걸 막을 수 있었습니다.
+
+FSD 기본 구조의 틀에 맞추기보단 **프로젝트에 맞도록 유연하게 기준을 정하고 지속적으로 유지**하는게 중요하다고 느꼈습니다.

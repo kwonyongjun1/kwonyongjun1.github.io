@@ -1,0 +1,165 @@
+---
+title: Nextjs Renderring(CSR, SSR, SSG)
+date: 2025-01-01T00:00:00Z
+description: Nextjs
+category: frontend
+tags: ["react", "nextjs"]
+releaseDate: 2025-01-01T00:00:00Z
+writer: kwonyongjun
+---
+
+Next.js는 Vercel에서 만든 **React 기반 프레임워크**입니다.  
+성능 최적화와 렌더링 전략을 기본으로 제공해, SEO와 초기 로딩 속도를 개선하는 데 강점이 있습니다.
+
+---
+
+## 주요 특징
+
+- 코드 분할을 자동으로 처리하여, 필요한 부분만 로드하고 성능 최적화
+- SSR, CSR, SSG를 모두 지원
+- 파일 기반 라우팅으로 페이지 구조를 간단히 구성
+- 이미지 최적화, 폰트 최적화, 라우트 캐싱 등 기본 성능 기능 제공
+
+---
+
+## 자동 코드 분할
+
+웹 애플리케이션이 전체 코드를 한 번에 다운로드하면 초기 로딩 시간이 길어집니다.  
+이를 줄이기 위해 **필요한 코드만 먼저 로드**하고, 이후 필요한 기능이 있을 때 추가 로드하는 것이 효율적입니다.
+
+- Next.js는 코드 분할 작업을 자동으로 처리
+- 개발자 설정 없이 페이지별로 필요한 코드만 분할하여 로드
+
+---
+
+## Pre-Rendering, Hydration
+
+<div>
+  <img src="/images/posts/frontend/12/image.png" />
+</div>
+
+### Pre-Rendering
+
+- 서버 단에서 DOM 요소를 빌드하여 HTML 문서를 렌더링
+- 데이터 페칭 결과를 포함한 HTML을 만들어 초기 렌더링을 빠르게 제공
+
+### Hydration
+
+- 미리 렌더링된 HTML에 javascript를 결합하여 이벤트가 동작할 수 있게 만드는 과정
+- 브라우저에서 React가 이벤트 핸들러를 연결해 상호작용 가능
+
+---
+
+## 렌더링 방식 비교
+
+### CSR(Client-Side Rendering)
+
+- 초기에는 비어있는 HTML을 전달하고, 이후 브라우저에서 React가 UI를 그립니다.
+- 모든 렌더링이 클라이언트에서 이루어지며, 사용자와의 인터렉션이 많은 페이지에 적합합니다.
+- 대시보드, 비동기 데이터 로드가 필요한 애플리케이션, SEO가 중요하지 않은 페이지에 사용합니다.
+- 코드 최상단에 **"use client"** 작성이 필요합니다.
+
+```tsx
+"use client";
+
+import { useEffect, useState } from "react";
+
+type Stats = { users: number };
+
+export default function DashboardPage() {
+  const [stats, setStats] = useState<Stats | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((res) => res.json())
+      .then(setStats);
+  }, []);
+
+  if (!stats) return <p>Loading...</p>;
+  return <p>Users: {stats.users}</p>;
+}
+```
+
+### SSR(Server-Side Rendering)
+
+- 각 요청마다 HTML을 서버에서 동적으로 생성합니다.
+- SEO 최적화에 유리해, SEO와 초기 데이터가 중요한 페이지에 적합합니다.
+- 사용자 요청마다 페이지를 동적으로 생성해야 하는 상황에 사용합니다.
+- **App Router**에서는 서버 컴포넌트의 **async** 함수와 **fetch** API를 사용한다.
+- **Pages Router**에서는 **getServerSideProps**로 데이터를 불러옵니다.
+
+```tsx
+type Post = { title: string };
+
+export default async function PostPage({ params }: { params: { id: string } }) {
+  const res = await fetch(`https://example.com/posts/${params.id}`, {
+    cache: "no-store",
+  });
+  const post = (await res.json()) as Post;
+
+  return <h1>{post.title}</h1>;
+}
+```
+
+### SSG(Static Site Generation)
+
+- 빌드 시점에 HTML을 생성해 정적 파일로 제공하고, 재사용되기 때문에 매우 빠른 페이지 로드 속도가 장점입니다.
+- 업데이트가 자주 필요하지 않은 블로그 게시물, 마케팅 페이지에 적합합니다.
+- App Router에서는 **generateStaticParams**, **generateMetadata**로 정적 파일 생성합니다.
+- Pages Router에서는 `getStaticProps`로 데이터를 받아오며 빌드 시 한 번만 호출합니다.
+
+#### generateStaticParams
+
+- 동적 라우트(`app/blog/[slug]`)에서 **사전에 생성할 파라미터 목록**을 반환합니다.
+- 빌드 시점에 호출되어 각 `slug`마다 정적 페이지를 생성합니다.
+- 반환 형식은 `[{ slug: "a" }, { slug: "b" }]`처럼 **params 객체 배열**입니다.
+
+#### generateMetadata
+
+- 페이지의 메타데이터 (title, description, openGraph 등)를 생성합니다.
+- `params`를 받아 개별 페이지에 맞는 메타 정보를 만들 수 있습니다.
+- `async` 함수로 작성 가능하며, 정적 `fetch`를 사용하면 빌드 시점에 평가됩니다.
+
+```tsx
+import type { Metadata } from "next";
+
+type Post = { title: string };
+
+export async function generateStaticParams() {
+  const res = await fetch("https://example.com/posts");
+  const posts = (await res.json()) as { slug: string }[];
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const res = await fetch(`https://example.com/posts/${params.slug}`);
+  const post = (await res.json()) as Post;
+
+  return {
+    title: post.title,
+    description: `게시글: ${post.title}`,
+  };
+}
+
+export default async function BlogPostPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const res = await fetch(`https://example.com/posts/${params.slug}`);
+  const post = (await res.json()) as Post;
+  return <h1>{post.title}</h1>;
+}
+```
+
+---
+
+## 정리
+
+- CSR: 상호작용 중심, SEO 중요도가 낮은 페이지
+- SSR: 최신 데이터와 SEO가 중요한 페이지
+- SSG: 변경이 드문 페이지, 매우 빠른 초기 로딩

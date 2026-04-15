@@ -1,13 +1,255 @@
 ---
-title: ReactQuery
+title: React Query
 date: 2025-01-01T00:00:00Z
-description: description
+description: React Query
 category: frontend
-tags: ["react"]
+tags: ["React", "ReactQuery", "Zustand", "SWR"]
 releaseDate: 2025-01-01T00:00:00Z
-writer: tester
+writer: kwonyongjun
 ---
 
-- ReactQuery
+프론트엔드 프로젝트가 커질수록 "서버 상태를 어디서, 어떻게 관리할지"가 성능과 유지보수성에 직접 영향을 준다.  
+프로젝트 규모가 커지면서 서버 데이터 요청 로직이 페이지마다 흩어지기 시작했다.  
+같은 API를 여러 컴포넌트에서 중복 호출하고, 로딩/에러 처리도 제각각이라 유지보수 비용이 빠르게 늘어났다.
 
-- ReactQuery vs SWR 비교
+캐시 전략, 재요청 타이밍, 낙관적 업데이트 등이 필요했고 서버 상태 관리를 체계적으로 다루기 위해 React Query를 도입했다.
+또한 UI 상태(모달, 필터, 테마)까지 React Query로 관리하려 하니 오히려 복잡해졌다.  
+그래서 서버 상태는 React Query, 클라이언트 UI 상태는 Zustand로 분리해 운영하는 방향을 선택했다.
+
+---
+
+## 관련 개념 정리
+
+### React Query 심화 포인트
+
+React Query는 단순한 데이터 패칭 도구가 아니라 "서버 상태 수명주기"를 관리하는 라이브러리다.  
+실무에서 체감이 큰 옵션은 다음과 같았다.
+
+- `staleTime`: 데이터를 신선하다고 간주하는 시간
+- `gcTime`(v5): 사용하지 않는 캐시를 메모리에서 정리하는 시간
+- `select`: 원본 응답에서 필요한 데이터만 구독해 불필요한 리렌더를 줄임
+- `placeholderData` / `keepPreviousData`: 페이지네이션 전환 UX 개선
+- `prefetchQuery`: 화면 진입 전 데이터 선로딩
+
+핵심은 "요청을 줄이는 것"보다 "언제 다시 가져올지"를 명확히 설계하는 것이다.
+
+### Zustand를 같이 쓰는 이유
+
+서버 상태와 클라이언트 상태를 (책임을) 분리하여 디버깅 포인트를 줄이는 것이다.
+
+- **React Query**: API 응답, 동기화, 재검증, 캐시 무효화
+- **Zustand**: 모달 열림 여부, 검색 조건, 정렬, 테마 토글 상태
+
+### SWR
+
+SWR도 서버 상태관리 라이브러리 후보였지만 아래와 같은 이유로 React Query를 사용하게 되었다.
+
+| 항목             | React Query                         | SWR                            |
+| ---------------- | ----------------------------------- | ------------------------------ |
+| 학습 난이도      | 상대적으로 높음                     | 상대적으로 낮음                |
+| 기능 범위        | 캐시 정책/Mutation/무효화 등 폭넓음 | 가볍고 단순한 데이터 패칭 중심 |
+| 복잡한 서버 상태 | 대규모 프로젝트에 유리              | 단순 구조에 빠르게 적용 가능   |
+| DevTools/생태계  | 풍부함                              | 간결함                         |
+
+정리하면, 단순 조회 위주의 페이지는 SWR도 충분하지만, Mutation과 캐시 제어가 복잡한 운영형 서비스에서는 React Query가 더 유리했다.
+
+### persistQueryClient
+
+`persistQueryClient`는 React Query 캐시를 브라우저 저장소에 유지해, 앱을 다시 열었을 때 기존 캐시를 복원해주는 기능이다.  
+즉 "처음부터 다시 로딩"하는 대신, 복원된 캐시를 먼저 보여주고 백그라운드에서 최신 데이터를 재검증할 수 있다.
+
+#### 사용되는 예시 case
+
+- 재방문 시 초기 로딩을 줄이고 싶은 경우
+- 사용자 설정값(예: 테마, 언어, 알림 설정)을 빠르게 복원해야 하는 경우
+- 네트워크 상태가 불안정한 환경에서 UX 안정성이 중요한 경우
+
+### 쿼리 키 네이밍 규칙
+
+React Query를 쓰면서 가장 많이 부딪힌 문제는 "무효화를 어디까지 해야 하는가"였다.  
+초기에는 `["users"]`, `["user"]`, `["userList"]`처럼 팀원마다 키를 다르게 쓰다 보니, Mutation 후 어떤 키를 `invalidateQueries` 해야 하는지 매번 확인이 필요했다.
+
+그래서 다음 기준으로 쿼리 키 네이밍 규칙을 정했다.
+
+- **도메인 우선**: 첫 세그먼트는 도메인 (`users`, `posts`, `theme`)
+- **리소스 타입 분리**: `list`와 `detail`을 명시적으로 구분
+- **파라미터 정규화**: 필터/정렬/페이지는 객체로 통일
+- **키 생성 함수 사용**: 문자열 하드코딩 대신 key factory로 관리
+
+이 규칙을 적용하니 "어떤 액션이 어떤 캐시를 갱신해야 하는지"를 예측하기 쉬워졌다.
+
+---
+
+## 실제 적용
+
+### 적용 전
+
+- 같은 API를 페이지/컴포넌트에서 중복 호출
+- 탭 이동 시 이전 데이터가 매번 사라져 UX가 불안정
+- 다크모드 테마 설정이 새로고침 때 초기화
+- 서버 상태와 UI 상태가 섞여 코드 책임이 모호
+
+### 적용 방법
+
+먼저 React Query 기본 전략을 프로젝트 전역에 통일했다.
+
+```tsx
+import { QueryClient } from "@tanstack/react-query";
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60, // 1분
+      gcTime: 1000 * 60 * 30, // 30분
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+```
+
+그리고 쿼리 키는 key factory로 묶어 관리했다.
+
+```tsx
+type UserListParams = {
+  page?: number;
+  sort?: "latest" | "popular";
+  keyword?: string;
+};
+
+export const queryKeys = {
+  users: {
+    all: ["users"] as const,
+    list: (params: UserListParams) => ["users", "list", params] as const,
+    detail: (id: string) => ["users", "detail", id] as const,
+  },
+  theme: {
+    preference: () => ["theme", "preference"] as const,
+  },
+};
+```
+
+실제로 고민했던 포인트는 "키를 얼마나 세분화할지"였다.
+
+- 너무 거칠면: 무효화 범위가 커져 불필요한 재요청 증가
+- 너무 잘게 나누면: 관리 포인트가 늘어나 실수 가능성 증가
+
+결국 현재는 "화면 단위가 아닌 도메인 + 리소스 단위"로 나누고, 파라미터가 변하는 조회만 별도 키로 분기하는 기준을 사용하고 있다.
+
+그다음 UI 상태는 Zustand로 분리했다.
+
+```tsx
+import { create } from "zustand";
+
+type Theme = "light" | "dark";
+
+type UiStore = {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
+};
+
+export const useUiStore = create<UiStore>((set, get) => ({
+  theme: "light",
+  setTheme: (theme) => set({ theme }),
+  toggleTheme: () => set({ theme: get().theme === "light" ? "dark" : "light" }),
+}));
+```
+
+다크모드 테마 기능을 실제로 개발할 때, `persistQueryClient`를 적용해 "사용자 테마 선호도"를 복원하는 방식으로 구현했다.  
+핵심은 앱 재실행 시 캐시된 테마 값을 먼저 반영해 화면 깜빡임을 줄이고, 이후 백그라운드 재검증으로 서버값과 동기화하는 것이다.
+
+```tsx
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
+
+const queryClient = new QueryClient();
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
+  key: "RQ_CACHE_V1",
+});
+
+// 실제로 다크모드 테마 기능에 적용했던 App 루트 설정
+<PersistQueryClientProvider
+  client={queryClient}
+  persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24 }} // 24시간
+>
+  <App />
+</PersistQueryClientProvider>;
+```
+
+```tsx
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useUiStore } from "./uiStore";
+
+async function fetchThemePreference() {
+  const res = await fetch("/api/users/me/theme");
+  if (!res.ok) throw new Error("theme fetch failed");
+  return (await res.json()) as { theme: "light" | "dark" };
+}
+
+export function ThemeBootstrapper() {
+  const setTheme = useUiStore((s) => s.setTheme);
+
+  const { data } = useQuery({
+    queryKey: queryKeys.theme.preference(),
+    queryFn: fetchThemePreference,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  useEffect(() => {
+    if (data?.theme) setTheme(data.theme);
+  }, [data, setTheme]);
+
+  return null;
+}
+```
+
+위 흐름을 적용한 뒤에는 새로고침 직후에도 마지막 테마 상태가 유지되어, 라이트/다크 테마 전환 시 발생하던 초기 깜빡임이 크게 줄었다.
+
+최적화는 다음 두 가지를 집중적으로 적용했다.
+
+- 목록 API는 `select`로 필요한 필드만 구독해 리렌더 횟수 감소
+- 라우트 진입 전 `prefetchQuery`를 수행해 초기 로딩 체감 개선
+
+추가로, Mutation 이후에는 `invalidateQueries` 범위를 최소화해 필요한 쿼리만 갱신하도록 관리했다.
+
+```tsx
+await mutation.mutateAsync(payload);
+
+// 전체 users 무효화 대신, 영향 있는 키만 선택적으로 무효화
+queryClient.invalidateQueries({
+  queryKey: queryKeys.users.list({ page: 1, sort: "latest" }),
+});
+queryClient.invalidateQueries({ queryKey: queryKeys.users.detail(userId) });
+```
+
+### 적용 후
+
+- 중복 API 호출이 줄고 캐시 활용률이 높아졌다.
+- 페이지 이동 시 데이터 유지가 자연스러워 UX가 안정됐다.
+- 다크모드가 새로고침/재접속 후에도 일관되게 복원됐다.
+- 서버 상태(React Query)와 UI 상태(Zustand) 책임이 분리되어 코드 가독성이 좋아졌다.
+
+---
+
+## 적용 후기
+
+### 좋았던 점
+
+- 서버 상태 관리 규칙이 통일되면서 팀 협업 속도가 빨라졌다.
+- `persistQuery` 덕분에 재방문 시 초기 체감 성능이 좋아졌다.
+- 테마/필터 같은 UI 상태를 Zustand로 분리해 디버깅이 쉬워졌다.
+
+### 아쉬웠던 점
+
+- React Query 옵션(`staleTime`, `gcTime`) 튜닝에 초반 시행착오가 있었다.
+- 캐시 정책이 과하면 오래된 데이터 노출 가능성이 있어 모니터링이 필요했다.
+- 팀 차원에서 쿼리 키 네이밍 규칙이 없으면 무효화 범위가 쉽게 넓어질 수 있었다.
+
+## 마무리
+
+React Query는 단순 패칭 라이브러리를 넘어 "서버 상태 운영 도구"에 가깝다.  
+Zustand와 역할을 분리하고, `persistQuery`를 함께 적용하면 성능과 사용자 경험을 동시에 챙길 수 있다.

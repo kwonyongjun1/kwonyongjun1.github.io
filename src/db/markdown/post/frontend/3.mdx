@@ -1,48 +1,64 @@
 ---
-title: NextAuth
+title: SSO 연동 NextAuth
 date: 2025-01-01T00:00:00Z
-description: description
+description: SSO 연동을 위한 NextAuth
 category: frontend
-tags: ["nextjs", "OAuth"]
+tags: ["Next.js", "NextAuth"]
 releaseDate: 2025-01-01T00:00:00Z
-writer: tester
+writer: kwonyongjun
 ---
 
-## NextAuth 사용 계기
+Next.js 프로젝트를 진행하며 회사 계정 기반으로 빠르게 접근 권한을 부여하려면 SSO 연동이 필요했고 인증 흐름을 직접 구현할지 라이브러리를 사용할지 먼저 판단해야 했다.
 
-로그인 기능 구현 중 **OAuth**가 필요했고, 직접 인증 흐름을 구축하는 대신  
-Next.js에 최적화된 인증 라이브러리인 **NextAuth**로 빠르게 구성하기 위해 선택했습니다.
+직접 OAuth/OIDC 플로우를 구성하면 유연성은 높지만 토큰 관리와 세션 보안, 콜백 처리까지 모두 책임져야 했다.  
+초기 개발 일정 안에서 안정적으로 구현하려면 검증된 라이브러리를 활용하는 편이 더 적합하다고 봤다.
 
----
+그래서 Next.js 환경에 맞는 NextAuth를 중심으로 학습했고 프로젝트에 붙이기 전에 핵심 개념과 실제 적용 포인트를 정리했다.
 
-## NextAuth란?
+## 관련 개념 정리
 
-Next.js에서 인증을 쉽게 구성할 수 있도록 도와주는 라이브러리입니다.
+### SSO와 OAuth/OIDC 기본 개념
 
-- OAuth(GitHub, Google 등)와 Credentials 인증을 지원
-- 세션 관리(JWT/DB), 보안 쿠키 처리 자동화
-- 서버/클라이언트에서 인증 상태를 쉽게 조회 가능
-- 다양한 DB 어댑터(Prisma 등)와 연동 가능
+SSO(Single Sign-On)는 한 번 인증하면 여러 서비스에서 로그인 상태를 공유하는 방식이다.  
+실무에서는 OAuth/OIDC를 기반으로 구현하는 경우가 많고 프론트엔드 입장에서는 "로그인 성공 후 세션을 어떻게 안전하게 유지할지"가 핵심이다.
 
----
+- **OAuth**: 외부 제공자에게 인증을 위임
+- **OIDC**: OAuth 위에 사용자 식별 정보(ID 토큰) 개념을 확장
+- **세션 전략**: JWT 기반 또는 DB 기반 세션 저장
 
-## NextAuth v5 특징
+중요한 포인트는 로그인 자체보다 "갱신/만료/로그아웃까지 포함한 상태 관리"이다.
 
-- App Router 우선 지원(기존 Pages Router도 호환)
-- 설정 구조 간소화(`auth.ts` 중심 구성)
-- Preview 환경/Edge Runtime 관련 지원 개선
-- 계정 연결 콜백 등 인증 흐름 확장성 강화
+### NextAuth가 해결해주는 부분
 
----
+NextAuth는 Next.js에서 인증 흐름 구현 시 반복되는 보일러플레이트를 줄여준다.
 
-## 기본 구성 (App Router)
+- OAuth Provider 연동 구조 제공
+- 세션/JWT 처리 표준화
+- 보안 쿠키 및 인증 라우트 처리 자동화
+- 콜백을 통한 토큰/세션 커스터마이징 지원
 
-### 1) 핵심 파일 구조
+학습하며 느낀 점은 NextAuth가 인증 로직의 난이도를 낮춰주되 "콜백 설계"는 여전히 팀 기준이 필요하다는 점이었다.
 
-- `src/auth.ts`: NextAuth 설정을 모으는 진입점
-- `src/app/api/auth/[...nextauth]/route.ts`: 라우트 핸들러 연결
+### 관련 사례 또는 비교
 
-### 2) NextAuth 기본 구조
+| 방식          | 장점                           | 단점                  | 언제 적합한가                              |
+| ------------- | ------------------------------ | --------------------- | ------------------------------------------ |
+| 직접 구현     | 요구사항 맞춤 제어 가능        | 보안/유지보수 비용 큼 | 인증 도메인이 핵심 비즈니스인 경우         |
+| NextAuth 사용 | 빠른 도입, 구조 표준화, 안정성 | 내부 동작 학습 필요   | 일반적인 SSO/OAuth 연동이 필요한 웹 서비스 |
+
+이번 프로젝트는 "빠른 안정화 + 팀 생산성"이 우선이라 NextAuth를 선택했다.
+
+## NextAuth 적용
+
+### 적용 전
+
+- 인증 플로우를 직접 구현할지 라이브러리를 쓸지 기준이 없었음
+- SSO 연동 시 필요한 콜백/세션 처리 지식이 팀 내에서 분산돼 있었음
+- 라우트 보호와 클라이언트 인증 상태 조회 방식이 통일되지 않았음
+
+### 적용 방법
+
+학습 단계에서 먼저 App Router 기준 최소 구성을 만들고, 이후 프로젝트 규칙에 맞춰 확장했다.
 
 ```ts
 // src/auth.ts
@@ -58,43 +74,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token }) {
+    async jwt({ token, account }) {
+      // provider access token이 있으면 JWT에 보관
+      if (account?.access_token) token.accessToken = account.access_token;
       return token;
     },
     async session({ session, token }) {
+      // 클라이언트에서 필요한 최소 정보만 세션에 노출
       session.user = { ...session.user, id: token.sub };
+      session.accessToken = token.accessToken as string | undefined;
       return session;
     },
   },
 });
 ```
 
-#### NextAuth() 반환 함수
-
-- `handlers`: `/api/auth` 요청을 처리하는 핸들러
-- `signIn`: 서버에서 로그인 트리거(redirect 포함)
-- `signOut`: 서버에서 로그아웃 트리거
-- `auth`: 서버 컴포넌트/라우트에서 세션 조회
-
-#### NextAuth 옵션
-
-- `providers`: OAuth/자격 증명 공급자 목록
-- `session`: 세션 전략(`jwt` 또는 `database`)
-- `pages`: 커스텀 로그인/에러 페이지 경로 지정
-- `callbacks`: 인증 흐름을 커스터마이징
-  - `callbacks.signIn`: 로그인 허용/차단
-  - `callbacks.redirect`: 로그인 후 이동 경로 제어
-  - `callbacks.jwt`: JWT 토큰 커스터마이징
-  - `callbacks.session`: 세션 객체 커스터마이징
-
-### 3) 라우트 핸들러 연결
-
 ```ts
 // src/app/api/auth/[...nextauth]/route.ts
 export { GET, POST } from "@/auth";
 ```
 
-## 클라이언트 로그인/로그아웃 예시
+클라이언트와 서버에서 인증 상태를 확인하는 방식도 함께 정리했다.
 
 ```tsx
 "use client";
@@ -104,16 +104,12 @@ import { signIn, signOut } from "next-auth/react";
 export default function AuthButtons() {
   return (
     <div>
-      <button onClick={() => signIn("github")}>로그인</button>
+      <button onClick={() => signIn("github")}>SSO 로그인</button>
       <button onClick={() => signOut()}>로그아웃</button>
     </div>
   );
 }
 ```
-
----
-
-## 서버 컴포넌트에서 세션 확인
 
 ```tsx
 // app/(pages)/profile/page.tsx
@@ -121,24 +117,36 @@ import { auth } from "@/auth";
 
 export default async function ProfilePage() {
   const session = await auth();
-
   if (!session) return <p>로그인이 필요합니다.</p>;
+
   return <p>{session.user?.email}</p>;
 }
 ```
 
----
+학습하면서 3가지 팀 규칙을 정의했다.
 
-## 인증 흐름 요약
+- 세션에 담는 값은 "클라이언트에서 반드시 필요한 최소 정보"만 허용
+- 권한 체크는 서버 컴포넌트/라우트 기준으로 우선 처리
+- Provider별 예외 처리는 콜백에서 분기하되, 공통 인터페이스를 유지
 
-1. 사용자가 로그인 시도
-2. `signIn` → provider 인증
-3. `jwt` 콜백에서 토큰 구성
-4. `session` 콜백으로 클라이언트에 세션 전달
+### 적용 후
 
----
+- SSO 로그인 흐름을 짧은 시간 안에 안정적으로 붙일 수 있었다.
+- 인증 관련 코드 위치(`auth.ts`, route handler, callback)가 명확해져 유지보수가 쉬워졌다.
+- 서버/클라이언트에서 세션 조회 방식이 통일되어 디버깅 시간이 줄었다.
 
-## 정리
+## 적용 후기
 
-NextAuth는 OAuth와 세션 관리의 복잡성을 줄여주고,  
-App Router 환경에서도 **인증 흐름을 간결하게 유지**할 수 있게 해줍니다.
+프로젝트에서 SSO 연동이 필요해 시작한 학습이었지만 결국 핵심은 라이브러리 사용법보다 인증 책임 경계를 명확히 하는 것이었다.  
+NextAuth는 그 경계를 빠르게 잡아주는 좋은 출발점이었고 콜백/세션 규칙만 팀에 맞게 정리하면 실무에서도 충분히 안정적으로 운영할 수 있었다.
+
+### 좋았던 점
+
+- 인증 도입 속도가 빨라졌고, 팀원이 동일한 구조로 작업할 수 있었다.
+- NextAuth 콜백 기반으로 확장 포인트를 명확히 잡을 수 있었다.
+- App Router 환경에서 인증 처리 동선이 단순해졌다.
+
+### 아쉬웠던 점
+
+- 콜백(`jwt`, `session`)에 로직이 몰리면 가독성이 떨어질 수 있었다.
+- Provider별 필드 차이를 흡수하는 타입 정리가 초반에 번거로웠다.

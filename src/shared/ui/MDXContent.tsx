@@ -34,7 +34,7 @@ const MDXContent = async ({ content }: { content: string }) => {
               className="duration-150 ease-in-out hover:text-app-primary dark:hover:text-app-dark-primary"
             >
               <h2
-                className="font-bold text-2xl md:text-3xl mt-lg mb-lg cursor-pointer"
+                className="font-bold text-2xl md:text-3xl mt-2xl mb-lg cursor-pointer"
                 {...props}
               />
             </Link>
@@ -45,7 +45,7 @@ const MDXContent = async ({ content }: { content: string }) => {
               className="duration-150 ease-in-out hover:text-app-primary dark:hover:text-app-dark-primary"
             >
               <h3
-                className="font-semibold text-xl md:text-2xl mt-md mb-md cursor-pointer"
+                className="font-semibold text-xl md:text-2xl mt-2xl mb-md cursor-pointer"
                 {...props}
               />
             </Link>
@@ -85,7 +85,7 @@ const MDXContent = async ({ content }: { content: string }) => {
           ),
           hr: (props) => (
             <hr
-              className="my-xl border-t-app-sub-bg dark:border-t-app-dark-sub-bg"
+              className="my-lg border-t-app-sub-bg dark:border-t-app-dark-sub-bg"
               {...props}
             />
           ),
